@@ -14,7 +14,7 @@ class GroupmeMessage:
 
   def get_image_url(self):
     if self.__has_native_image():
-      return self.request["attachments"][0]["url"]
+      return next(attachment["url"] for attachment in self.request["attachments"] or [] if self._is_attachment_image(attachment))
     elif self.__has_linked_image():
       return self.request["text"]
     else:
@@ -25,13 +25,11 @@ class GroupmeMessage:
     if (not "attachments" in self.request):
         return False
 
-    attachments = self.request["attachments"]
+    all_attachments = self.request["attachments"] or []
 
-    if (len(attachments) != 1):
-        return False
+    return any(attachment for attachment in all_attachments if self._is_attachment_image(attachment))
 
-    attachment = attachments[0]
-
+  def _is_attachment_image(self, attachment):
     return "type" in attachment and attachment["type"] == 'image'
 
   def __has_linked_image(self):
