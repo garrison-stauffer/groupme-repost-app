@@ -83,7 +83,7 @@ def get_reposter_string(dynamo_results):
 def map_record_to_string(record):
     print("attempting to process record:", record)
     name = record["created_by_name"]
-    timestamp = datetime.fromtimestamp(record["created_at"]).astimezone(timezone('US/Eastern')).strftime("%m/%d/%Y at %H:%M %p")
+    timestamp = datetime.fromtimestamp(record["created_at"]).astimezone(timezone('US/Eastern')).strftime("%m/%d/%Y at %H:%M")
 
     return "{} on {}".format(name, timestamp)
 
