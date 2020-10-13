@@ -54,6 +54,19 @@ def lambda_handler(event, context):
     dhash_digest = dhash(cv2_image)
     print("dhash =", dhash_digest)
 
+    determine_if_repost_and_send_message_if_so(dhash_digest)
+    insert_item(message, dhash_digest)
+
+    return ok()
+
+def determine_if_repost_and_send_message_if_so(dhash_digest):
+    """
+        Have been having issues with 0 being a common collision point, for now
+        we will just ignore them when checking for reposts.
+    """
+    if (dhash_digest == 0):
+        return
+
     try:
         query_result = table.query(
             IndexName="img_dhash-created_at-index-copy",
@@ -69,11 +82,6 @@ def lambda_handler(event, context):
         print("Error while querying dynamodb for prior examples:", e)
         traceback.print_exc()
         send_info_message("Error ocurred while querying for image")
-
-    insert_item(message, dhash_digest)
-
-    return ok()
-
 
 def get_reposter_string(dynamo_results):
     return ", ".join(
